@@ -1,0 +1,18 @@
+# data dirs: contents stay out of git, READMEs stay in
+input/*
+!input/README.md
+output/*
+!output/README.md
+target/verify/
+
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
