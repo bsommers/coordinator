@@ -45,3 +45,10 @@ def test_no_frameworks(make_repo):
 
 def test_numbered_next_steps_heading():
     assert A.next_step("## 6. Next Steps (Exact Commands In Order)\n1. Verify: `git status`\n") == "Verify: `git status`"
+
+
+def test_git_info_unborn_branch(tmp_path):
+    import subprocess
+    from coordinator.scan import git_info
+    subprocess.run(["git", "init", "-q", "-b", "trunk", str(tmp_path)], check=True)
+    assert git_info(tmp_path)["branch"] == "trunk"

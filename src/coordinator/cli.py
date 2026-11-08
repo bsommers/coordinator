@@ -78,7 +78,10 @@ def cmd_track(cfg, args):
     elif args.action == "clear":
         st.set_tracked(set())
     elif args.action == "auto":  # add the top-n most recent H1 projects
-        for p in view.select(cfg, st, now, 1, args.top):
+        top = view.select(cfg, st, now, 1, args.top)
+        if args.prune:  # drop tracked projects that are no longer in the H1 set
+            st.set_tracked({p.key for p in top})
+        for p in top:
             st.track(p.key)
     st.commit()
     keys = sorted(st.tracked())
@@ -183,6 +186,8 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("action", choices=["add", "rm", "list", "clear", "auto"])
     sp.add_argument("names", nargs="*")
     sp.add_argument("--top", type=int, help="for 'auto': how many H1 projects")
+    sp.add_argument("--prune", action="store_true",
+                    help="for 'auto': also untrack projects outside the selected H1 set")
     add("refresh", cmd_refresh, "re-scan tracked projects and update the status repo")
     sp = add("watch", cmd_watch, "scan + refresh on an interval")
     sp.add_argument("--interval", type=int, default=300)
@@ -208,8 +213,6 @@ def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     cfg = load(args.root)
     try:
-        if args.cmd == "track" and args.action == "list":
-            args.action = "noop"
         args.fn(cfg, args)
     except engine.Busy as e:
         print(f"coordinator: {e}", file=sys.stderr)

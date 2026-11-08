@@ -100,6 +100,10 @@ def git_info(path: Path) -> dict:
     out = _git(path, "status", "--porcelain=v1", "-b").splitlines()
     if out and out[0].startswith("## "):
         head = out[0][3:]
+        for prefix in ("No commits yet on ", "Initial commit on "):
+            if head.startswith(prefix):  # unborn branch: "## No commits yet on master"
+                head = head[len(prefix):]
+                break
         info["branch"] = head.split("...")[0].split(" ")[0]
         if "[" in head:
             for part in head[head.index("[") + 1:].rstrip("]").split(","):

@@ -29,3 +29,16 @@ def test_end_to_end_workflow(cfg, make_repo):
     assert json.loads(cli(cfg, "--json", "show", "beta"))["status"] == "spiking"
     assert "Task:" in cli(cfg, "brief", "beta")
     assert "alpha" in cli(cfg, "tui", "--once")
+
+
+def test_track_list_is_readonly_and_auto_prune(cfg, make_repo):
+    make_repo("alpha", {"docs/CHECKPOINT.md": CHECKPOINT})
+    make_repo("beta")
+    cli(cfg, "scan")
+    cli(cfg, "track", "add", "alpha")
+    assert json.loads(cli(cfg, "--json", "track", "list")) == ["alpha"]
+    cli(cfg, "track", "auto", "--top", "1")  # adds, never removes
+    assert len(json.loads(cli(cfg, "--json", "track", "list"))) >= 1
+    cli(cfg, "track", "add", "beta")
+    kept = json.loads(cli(cfg, "--json", "track", "auto", "--top", "1", "--prune"))
+    assert len(kept) == 1

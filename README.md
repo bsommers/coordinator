@@ -18,6 +18,10 @@ uv tool install -e .                                  # optional: puts `coordina
 scripts/verify.sh --quick                             # lint + smoke + unit
 ```
 
+## Documentation
+
+Start at [docs/README.md](docs/README.md): [purpose](docs/purpose.md), [architecture](docs/architecture.md), [using & configuration](docs/running.md), [how-to recipes](docs/how-to.md), [user manual](docs/usermanual/README.md).
+
 ## Layout
 
 | Path | Holds |
@@ -25,7 +29,7 @@ scripts/verify.sh --quick                             # lint + smoke + unit
 | `src/coordinator/` | adapters, scan, store, graph, export, engine, cli, tui |
 | `tests/` | smoke, unit, integration, system, perf, stress, torture |
 | `scripts/verify.sh` | tiered test runner → `target/verify/` |
-| `docs/` | SPEC.md, adr/ |
+| `docs/` | purpose, architecture, running, how-to, usermanual/, SPEC.md |
 | `input/`, `output/` | git-ignored data (READMEs tracked) |
 
 Runtime state is **not** in this repo: `~/.local/share/coordinator/` (override `COORDINATOR_HOME`),
