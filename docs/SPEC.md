@@ -28,7 +28,7 @@ Config: `~/.config/coordinator/config.toml` (keys: `root`, `data_dir`, `horizons
 
 ## Surfaces (parity)
 CLI (all take `--json`): `paths scan list show track refresh watch gaps brief note graph tui`.
-TUI (curses, stdlib): horizon filter 1/2/3/a, move j/k, enter = detail, `t` track, `s` scan, `r` refresh. List/detail rendering shares `view.py` with the CLI.
+TUI (curses, stdlib): horizon filter 1/2/3/a, move j/k, enter = detail, `t` track, `s` scan, `r` refresh, `g` dependency graph. List/detail rendering shares `view.py` with the CLI.
 
 ## Status fields
 `status` (newest `status:` frontmatter / `**Status:**` line among signal files), `phase`, `done/total`

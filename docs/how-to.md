@@ -76,6 +76,9 @@ Add `depends: [lib, tools/other]` to a status doc's frontmatter (key, or unique 
 coordinator graph
 # 2 projects, 1 edges, 0 cycle(s)
 # demo -> lib
+
+coordinator graph --markdown > deps.md   # Mermaid flowchart + edges table
+coordinator graph --tui                  # scrollable view (also `g` inside `coordinator tui`)
 ```
 
 A project's rollup activity is the max of its own and its dependencies'. Cycles are reported and collapsed, not errors.

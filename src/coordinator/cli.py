@@ -148,13 +148,17 @@ def cmd_graph(cfg, args):
     projs = st.all()
     comps = graph.rollup(projs)
     edges = graph.build_edges(projs)
+    if args.tui:
+        from . import tui
+        tui.run(cfg, once=args.once, graph=True)
+        return
     cyc = [c for c in comps if len(c) > 1]
     payload = {"components": comps, "cycles": cyc,
                "edges": {k: sorted(v) for k, v in edges.items() if v}}
-    lines = [f"{len(projs)} projects, {sum(len(v) for v in edges.values())} edges, {len(cyc)} cycle(s)"]
-    lines += [f"cycle (collapsed): {' <-> '.join(c)}" for c in cyc]
-    lines += [f"{k} -> {', '.join(sorted(v))}" for k, v in sorted(edges.items()) if v]
-    _emit(args, payload, lines)
+    if args.markdown and not args.json:
+        print(view.graph_markdown(len(projs), edges, comps), end="")
+        return
+    _emit(args, payload, view.graph_lines(len(projs), edges, comps))
 
 
 def cmd_tui(cfg, args):
@@ -202,7 +206,10 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("--status")
     sp.add_argument("--next")
     sp.add_argument("--source", default="agent")
-    add("graph", cmd_graph, "dependency graph, cycles collapsed")
+    sp = add("graph", cmd_graph, "dependency graph, cycles collapsed (stdout, --markdown, or --tui)")
+    sp.add_argument("--markdown", action="store_true", help="render a Markdown report with a Mermaid diagram")
+    sp.add_argument("--tui", action="store_true", help="show in the interactive terminal UI")
+    sp.add_argument("--once", action="store_true", help="with --tui: print one frame and exit")
     sp = add("tui", cmd_tui, "interactive terminal UI")
     sp.add_argument("--once", action="store_true", help="print one frame and exit")
     sp.add_argument("--horizon", choices=list(HZ), default="1")

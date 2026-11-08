@@ -46,7 +46,7 @@ Dependencies point downward only. Surfaces never parse files; adapters never tou
 | `graph.py` | `depends:` edges, Tarjan SCCs, one-pass `rollup_ts`, `refresh_order()`. |
 | `engine.py` | `scan()` (incremental or full), `refresh()` (tracked set + export), process lock. |
 | `export.py` | Writes `INDEX.md` and `projects/<key>.md` into the status repo; commits only on change. |
-| `view.py` | `select()`, `row()`, `detail()` shared by CLI and TUI. |
+| `view.py` | `select()`, `row()`, `detail()`, `graph_lines()`, `graph_markdown()` shared by CLI and TUI. |
 | `cli.py` / `tui.py` | Surfaces. |
 
 ## Data flow

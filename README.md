@@ -14,7 +14,7 @@ PYTHONPATH=src python3 -m coordinator list            # H1 (<7d), top 10
 PYTHONPATH=src python3 -m coordinator track auto      # track the top-N H1 set
 PYTHONPATH=src python3 -m coordinator refresh         # rescan tracked + update status repo
 PYTHONPATH=src python3 -m coordinator tui             # interactive
-uv tool install -e .                                  # optional: puts `coordinator` on PATH
+scripts/install.sh                                    # puts `coordinator` on PATH (--copy / --uninstall also available)
 scripts/verify.sh --quick                             # lint + smoke + unit
 ```
 

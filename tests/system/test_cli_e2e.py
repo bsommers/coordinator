@@ -42,3 +42,14 @@ def test_track_list_is_readonly_and_auto_prune(cfg, make_repo):
     cli(cfg, "track", "add", "beta")
     kept = json.loads(cli(cfg, "--json", "track", "auto", "--top", "1", "--prune"))
     assert len(kept) == 1
+
+
+def test_graph_markdown_and_tui_once(cfg, make_repo):
+    make_repo("a", {"CHECKPOINT.md": "---\ndepends: [b]\n---\nStatus: x\n"})
+    make_repo("b", {"CHECKPOINT.md": "Status: y\n"})
+    cli(cfg, "scan")
+    assert "a -> b" in cli(cfg, "graph")
+    md = cli(cfg, "graph", "--markdown")
+    assert "```mermaid" in md and "-->" in md
+    assert "a -> b" in cli(cfg, "graph", "--tui", "--once")
+    assert "components" in cli(cfg, "--json", "graph", "--markdown")  # --json wins

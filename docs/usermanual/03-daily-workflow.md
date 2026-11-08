@@ -21,7 +21,7 @@ coordinator tui
 ```
 
 ## TUI
-Start with `coordinator tui` (`--horizon 2` or `all` to open elsewhere). Keys: `j/k` move, `1 2 3 a` horizon, `Enter` detail, `t` track, `s` scan, `r` refresh, `q` quit. `coordinator tui --once` prints a single frame, which is handy for scripts.
+Start with `coordinator tui` (`--horizon 2` or `all` to open elsewhere). Keys: `j/k` move, `1 2 3 a` horizon, `Enter` detail, `t` track, `s` scan, `r` refresh, `g` dependency graph (toggle), `q` quit. `coordinator tui --once` prints a single frame, which is handy for scripts.
 
 ## Scripting
 Put `--json` before the command: `coordinator --json list | jq '.[].next_step'`.

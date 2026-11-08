@@ -12,7 +12,7 @@ Linux or macOS, Python ≥ 3.11, `git`. No packages to install.
 ```bash
 cd coordinator
 PYTHONPATH=src python3 -m coordinator paths     # works without installing
-uv tool install -e .                            # optional: `coordinator` on PATH
+scripts/install.sh                              # optional: `coordinator` on PATH (uv or pipx)
 ```
 
 ## Init → verify → first run

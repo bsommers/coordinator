@@ -23,8 +23,8 @@ Linux or macOS (needs `fcntl`), Python ≥ 3.11, `git` on PATH. No other depende
 # run from a checkout, no install
 PYTHONPATH=src python3 -m coordinator paths
 
-# or put `coordinator` on PATH
-uv tool install -e .
+# or put `coordinator` on PATH (uv or pipx; user-level, no root)
+scripts/install.sh              # editable; --copy for a standalone install, --uninstall to remove
 ```
 
 The examples below use `coordinator` for brevity; substitute the `PYTHONPATH=src python3 -m coordinator` form if not installed.
@@ -61,7 +61,7 @@ Global flags go **before** the subcommand: `coordinator --root ~/work --json lis
 | `gaps` | `--all` | Projects with gaps (tracked only unless `--all`) |
 | `brief NAME` | | Fact pack for an agent session; no LLM is called |
 | `note NAME TEXT` | `--status`, `--next`, `--source` (default `agent`) | Record an override that holds until the project's docs are newer |
-| `graph` | | Dependency edges and collapsed cycles |
+| `graph` | `--markdown`, `--tui`, `--once` | Dependency edges and collapsed cycles. Default prints text to stdout; `--markdown` prints a report with a Mermaid flowchart (redirect to save it); `--tui` opens the TUI graph view, and `--tui --once` prints one frame. `--json` takes precedence over `--markdown` |
 | `tui` | `--once`, `--horizon {1,2,3,all}` | Interactive UI; `--once` prints one frame |
 
 Gap codes: `no-status-doc`, `no-status-line`, `no-next-step`, `stale-status`.
@@ -76,6 +76,7 @@ Gap codes: `no-status-doc`, `no-status-line`, `no-next-step`, `stale-status`.
 | `t` | Track / untrack selected |
 | `s` | Incremental scan |
 | `r` | Refresh |
+| `g` | Toggle dependency graph view (`j`/`k` scroll) |
 | `q` | Quit |
 
 ## Configuration

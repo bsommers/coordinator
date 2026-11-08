@@ -43,3 +43,20 @@ def test_sccs_random_graphs_partition_nodes():
         comps = graph.sccs(e)
         flat = [k for c in comps for k in c]
         assert sorted(flat) == sorted(e) and len(flat) == len(set(flat))
+
+
+def test_graph_markdown_mermaid_and_cycles():
+    from coordinator import view
+    ps = [P('we"ird<a>', ["b"]), P("b", ["we\"ird<a>"]), P("c", ["b"]), P("solo")]
+    comps = graph.rollup(ps)
+    md = view.graph_markdown(len(ps), graph.build_edges(ps), comps)
+    assert "```mermaid" in md and "flowchart LR" in md
+    assert '["we\'ird&lt;a&gt;"]' in md          # label escaped; node ids synthetic (n0..)
+    assert "classDef cyc" in md and "## Cycles (collapsed)" in md
+    assert "solo" not in md.split("## Edges")[1]
+
+
+def test_graph_markdown_empty():
+    from coordinator import view
+    md = view.graph_markdown(1, {"a": set()}, [["a"]])
+    assert "mermaid" not in md and "No dependencies" in md

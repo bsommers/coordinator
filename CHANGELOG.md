@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. Format: [Keep a Changelog](https://keepachangelog.com/); versions follow SemVer.
 
+## [Unreleased]
+
+### Added
+- `coordinator graph --markdown` (Markdown report with Mermaid diagram) and `--tui` / `--tui --once` (TUI graph view); `g` toggles the graph in the TUI.
+- `scripts/install.sh`: user-level install via uv or pipx (`--copy`, `--uninstall`).
+
 ## [v0.1.0] - 2026-11-08
 
 ### Added
