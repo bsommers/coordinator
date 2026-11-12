@@ -47,8 +47,9 @@ def test_track_list_is_readonly_and_auto_prune(cfg, make_repo):
 def test_graph_markdown_and_tui_once(cfg, make_repo):
     make_repo("a", {"CHECKPOINT.md": "---\ndepends: [b]\n---\nStatus: x\n"})
     make_repo("b", {"CHECKPOINT.md": "Status: y\n"})
+    make_repo("c", {"CHECKPOINT.md": "Status: z\n"})
     cli(cfg, "scan")
-    assert "a -> b" in cli(cfg, "graph")
+    assert "a -> b" in cli(cfg, "graph") and "no dependencies" in cli(cfg, "graph")
     md = cli(cfg, "graph", "--markdown")
     assert "```mermaid" in md and "-->" in md
     assert "a -> b" in cli(cfg, "graph", "--tui", "--once")

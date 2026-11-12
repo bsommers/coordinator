@@ -16,8 +16,8 @@ def frame(cfg: Config, store: Store, hz: int | None, sel: int, now: int, width: 
           height: int, detail: bool, show_graph: bool = False) -> list[str]:
     if show_graph:
         projs = store.all()
-        comps = graph.rollup(projs)
-        gl = view.graph_lines(len(projs), graph.build_edges(projs), comps)
+        edges, inferred, comps = graph.full_graph(projs)
+        gl = view.graph_lines(sorted(p.key for p in projs), edges, comps, inferred)
         body = height - 3
         off = max(0, min(sel, len(gl) - body))
         return (["coordinator  graph  (j/k scroll  g back  q quit)"[:width], "-" * min(width, 100)]

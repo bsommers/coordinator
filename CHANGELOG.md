@@ -6,6 +6,7 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 
 ### Added
 - `coordinator graph --markdown` (Markdown report with Mermaid diagram) and `--tui` / `--tui --once` (TUI graph view); `g` toggles the graph in the TUI.
+- `graph` lists projects with no dependencies and infers display-only edges from local-path dependencies in `pyproject.toml`, `Cargo.toml`, `package.json` and `go.mod` (`~>` in text, dashed in Mermaid); `--json` adds `inferred` and `isolated`.
 - `scripts/install.sh`: user-level install via uv or pipx (`--copy`, `--uninstall`).
 
 ## [v0.1.0] - 2026-11-08

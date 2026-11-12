@@ -74,12 +74,18 @@ Add `depends: [lib, tools/other]` to a status doc's frontmatter (key, or unique 
 
 ```bash
 coordinator graph
-# 2 projects, 1 edges, 0 cycle(s)
-# demo -> lib
+# 3 projects, 2 edges (1 inferred), 0 cycle(s)
+# demo -> lib        declared (depends: frontmatter)
+# tool ~> lib        inferred from a local-path dependency in a manifest
+#
+# no dependencies (1):
+#   other
 
 coordinator graph --markdown > deps.md   # Mermaid flowchart + edges table
 coordinator graph --tui                  # scrollable view (also `g` inside `coordinator tui`)
 ```
+
+Edges are also inferred from local-path dependencies in `pyproject.toml`, `Cargo.toml`, `package.json` (`file:`/`link:`) and `go.mod` (`replace`). Every project is listed; those without edges appear under "no dependencies". Inferred edges are display-only (dashed in Mermaid) and do not affect rollup.
 
 A project's rollup activity is the max of its own and its dependencies'. Cycles are reported and collapsed, not errors.
 

@@ -61,7 +61,7 @@ Global flags go **before** the subcommand: `coordinator --root ~/work --json lis
 | `gaps` | `--all` | Projects with gaps (tracked only unless `--all`) |
 | `brief NAME` | | Fact pack for an agent session; no LLM is called |
 | `note NAME TEXT` | `--status`, `--next`, `--source` (default `agent`) | Record an override that holds until the project's docs are newer |
-| `graph` | `--markdown`, `--tui`, `--once` | Dependency edges and collapsed cycles. Default prints text to stdout; `--markdown` prints a report with a Mermaid flowchart (redirect to save it); `--tui` opens the TUI graph view, and `--tui --once` prints one frame. `--json` takes precedence over `--markdown` |
+| `graph` | `--markdown`, `--tui`, `--once` | Declared (`->`) and manifest-inferred (`~>`) dependency edges, collapsed cycles, and projects with no dependencies. Default prints text to stdout; `--markdown` prints a report with a Mermaid flowchart (redirect to save it); `--tui` opens the TUI graph view, and `--tui --once` prints one frame. `--json` takes precedence over `--markdown` |
 | `tui` | `--once`, `--horizon {1,2,3,all}` | Interactive UI; `--once` prints one frame |
 
 Gap codes: `no-status-doc`, `no-status-line`, `no-next-step`, `stale-status`.

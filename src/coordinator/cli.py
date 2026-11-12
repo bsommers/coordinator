@@ -144,21 +144,21 @@ def cmd_note(cfg, args):
 
 
 def cmd_graph(cfg, args):
-    st = _store(cfg)
-    projs = st.all()
-    comps = graph.rollup(projs)
-    edges = graph.build_edges(projs)
     if args.tui:
         from . import tui
         tui.run(cfg, once=args.once, graph=True)
         return
-    cyc = [c for c in comps if len(c) > 1]
-    payload = {"components": comps, "cycles": cyc,
-               "edges": {k: sorted(v) for k, v in edges.items() if v}}
+    projs = _store(cfg).all()
+    edges, inferred, comps = graph.full_graph(projs)
+    keys = sorted(p.key for p in projs)
+    payload = {"components": comps, "cycles": [c for c in comps if len(c) > 1],
+               "edges": {k: sorted(v) for k, v in edges.items() if v},
+               "inferred": sorted([a, b] for a, b in inferred),
+               "isolated": view._stats(keys, edges, comps)[2]}
     if args.markdown and not args.json:
-        print(view.graph_markdown(len(projs), edges, comps), end="")
+        print(view.graph_markdown(keys, edges, comps, inferred), end="")
         return
-    _emit(args, payload, view.graph_lines(len(projs), edges, comps))
+    _emit(args, payload, view.graph_lines(keys, edges, comps, inferred))
 
 
 def cmd_tui(cfg, args):

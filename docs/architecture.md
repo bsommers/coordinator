@@ -43,7 +43,7 @@ Dependencies point downward only. Surfaces never parse files; adapters never tou
 | `adapters.py` | Detect a framework in a repo and return `Facts` (status, phase, done/total, next step, depends). |
 | `scan.py` | `discover()` finds project roots; `scan_project()` merges adapter facts with git info; `fingerprint()`; `compute_gaps()`. |
 | `store.py` | sqlite: `projects` (JSON blob per key), `tracked`, `notes`. `effective()` overlays a note on a project. |
-| `graph.py` | `depends:` edges, Tarjan SCCs, one-pass `rollup_ts`, `refresh_order()`. |
+| `graph.py` | `depends:` edges, Tarjan SCCs, one-pass `rollup_ts`, `refresh_order()`; `infer_edges()` / `full_graph()` for display-only manifest-derived edges. |
 | `engine.py` | `scan()` (incremental or full), `refresh()` (tracked set + export), process lock. |
 | `export.py` | Writes `INDEX.md` and `projects/<key>.md` into the status repo; commits only on change. |
 | `view.py` | `select()`, `row()`, `detail()`, `graph_lines()`, `graph_markdown()` shared by CLI and TUI. |
@@ -128,6 +128,11 @@ Edges come only from authored `depends:` frontmatter (never from generated files
 key, or by basename if unique. Self-edges are dropped; cycles collapse into strongly connected
 components, and `rollup_ts` is a single max-join pass over the condensation DAG, so it is O(V+E)
 and never iterates to a fixpoint. `refresh_order` runs dependencies first.
+
+`coordinator graph` additionally shows **inferred** edges, read at display time from local-path
+dependencies in `pyproject.toml`, `Cargo.toml`, `package.json` (`file:`/`link:`) and `go.mod`
+(`replace … => ../x`). A target maps to the deepest scanned project containing it. Inferred edges are
+display-only: they never feed `rollup_ts` or `refresh_order`, and manifests are only read (1 MiB cap).
 
 ## Loop breakers
 
