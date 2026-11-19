@@ -146,7 +146,7 @@ def cmd_note(cfg, args):
 def cmd_graph(cfg, args):
     if args.tui:
         from . import tui
-        tui.run(cfg, once=args.once, graph=True)
+        tui.run(cfg, once=args.once, graph=True, names=args.infer_names)
         return
     projs = _store(cfg).all()
     edges, inferred, comps = graph.full_graph(projs, names=args.infer_names)

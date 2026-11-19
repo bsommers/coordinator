@@ -13,10 +13,10 @@ HELP = "j/k move  g graph  1/2/3/a horizon  t track  r refresh  s scan  enter de
 
 
 def frame(cfg: Config, store: Store, hz: int | None, sel: int, now: int, width: int,
-          height: int, detail: bool, show_graph: bool = False) -> list[str]:
+          height: int, detail: bool, show_graph: bool = False, names: bool = False) -> list[str]:
     if show_graph:
         projs = store.all()
-        edges, inferred, comps = graph.full_graph(projs)
+        edges, inferred, comps = graph.full_graph(projs, names=names)
         gl = view.graph_lines(sorted(p.key for p in projs), edges, comps, inferred)
         body = height - 3
         off = max(0, min(sel, len(gl) - body))
@@ -39,7 +39,7 @@ def frame(cfg: Config, store: Store, hz: int | None, sel: int, now: int, width: 
     return out
 
 
-def _loop(scr, cfg: Config, hz: int | None, graph_mode: bool = False) -> None:
+def _loop(scr, cfg: Config, hz: int | None, graph_mode: bool = False, names: bool = False) -> None:
     curses.curs_set(0)
     store = Store(cfg.db_path)
     sel, detail, msg = 0, False, ""
@@ -50,7 +50,7 @@ def _loop(scr, cfg: Config, hz: int | None, graph_mode: bool = False) -> None:
         ps = view.select(cfg, store, now, hz, 0)
         sel = max(0, sel) if show_graph else max(0, min(sel, len(ps) - 1))
         scr.erase()
-        lines = frame(cfg, store, hz, sel, now, w, h, detail, show_graph)
+        lines = frame(cfg, store, hz, sel, now, w, h, detail, show_graph, names)
         for y, l in enumerate(lines[:h - 1]):
             scr.addnstr(y, 0, l, w - 1)
         scr.addnstr(h - 1, 0, msg, w - 1)
@@ -82,9 +82,9 @@ def _loop(scr, cfg: Config, hz: int | None, graph_mode: bool = False) -> None:
                 msg = str(e)
 
 
-def run(cfg: Config, once: bool = False, hz: int | None = 1, graph: bool = False) -> None:
+def run(cfg: Config, once: bool = False, hz: int | None = 1, graph: bool = False, names: bool = False) -> None:
     if once:
         store = Store(cfg.db_path)
-        print("\n".join(frame(cfg, store, hz, 0, int(time.time()), 140, 40, False, graph)))
+        print("\n".join(frame(cfg, store, hz, 0, int(time.time()), 140, 40, False, graph, names)))
         return
-    curses.wrapper(_loop, cfg, hz, graph)
+    curses.wrapper(_loop, cfg, hz, graph, names)
