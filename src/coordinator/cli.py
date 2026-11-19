@@ -149,7 +149,7 @@ def cmd_graph(cfg, args):
         tui.run(cfg, once=args.once, graph=True)
         return
     projs = _store(cfg).all()
-    edges, inferred, comps = graph.full_graph(projs)
+    edges, inferred, comps = graph.full_graph(projs, names=args.infer_names)
     keys = sorted(p.key for p in projs)
     payload = {"components": comps, "cycles": [c for c in comps if len(c) > 1],
                "edges": {k: sorted(v) for k, v in edges.items() if v},
@@ -210,6 +210,8 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("--markdown", action="store_true", help="render a Markdown report with a Mermaid diagram")
     sp.add_argument("--tui", action="store_true", help="show in the interactive terminal UI")
     sp.add_argument("--once", action="store_true", help="with --tui: print one frame and exit")
+    sp.add_argument("--infer-names", action="store_true",
+                    help="also infer edges from package-name matches in manifests (heuristic)")
     sp = add("tui", cmd_tui, "interactive terminal UI")
     sp.add_argument("--once", action="store_true", help="print one frame and exit")
     sp.add_argument("--horizon", choices=list(HZ), default="1")

@@ -190,11 +190,78 @@ def infer_edges(projects: list[Project]) -> dict[str, set[str]]:
     return edges
 
 
-def full_graph(projects: list[Project]):
+def _norm(name: str) -> str:
+    return re.sub(r"[-_.]+", "-", name.strip().lower())
+
+
+def _pkg_info(d: Path) -> tuple[set[str], set[str]]:
+    """(names this project publishes, names it depends on) from its manifests."""
+    own: set[str] = set()
+    deps: set[str] = set()
+    for fname in ("pyproject.toml", "Cargo.toml"):
+        if not (d / fname).is_file():
+            continue
+        doc = _toml(d / fname)
+        for sect in ("project", "package"):
+            n = (doc.get(sect) or {}).get("name") if isinstance(doc.get(sect), dict) else None
+            if isinstance(n, str):
+                own.add(_norm(n))
+        proj = doc.get("project") if isinstance(doc.get("project"), dict) else {}
+        reqs = list(proj.get("dependencies") or [])
+        for grp in (proj.get("optional-dependencies") or {}).values():
+            reqs += list(grp or [])
+        for grp in (doc.get("dependency-groups") or {}).values():
+            reqs += [r for r in (grp or []) if isinstance(r, str)]
+        for r in reqs:
+            m = re.match(r"\s*([A-Za-z0-9][A-Za-z0-9._-]*)", r) if isinstance(r, str) else None
+            if m:
+                deps.add(_norm(m.group(1)))
+        for k, v in doc.items():  # Cargo-style tables: key is the crate name
+            if "dependencies" in k and isinstance(v, dict):
+                deps.update(_norm(x) for x in v)
+    if (d / "package.json").is_file():
+        try:
+            pj = json.loads(_read(d / "package.json"))
+        except ValueError:
+            pj = {}
+        if isinstance(pj, dict):
+            if isinstance(pj.get("name"), str):
+                own.add(_norm(pj["name"]))
+            for sect in ("dependencies", "devDependencies", "optionalDependencies"):
+                if isinstance(pj.get(sect), dict):
+                    deps.update(_norm(x) for x in pj[sect])
+    return own, deps
+
+
+def infer_edges_by_name(projects: list[Project]) -> dict[str, set[str]]:
+    """Opt-in: A -> B when A's manifest depends on a package name that exactly one scanned
+    project publishes. Ambiguous names (published by several projects) are skipped, as are
+    self-references. Heuristic: a same-named registry package can still false-match."""
+    info = {p.key: _pkg_info(Path(p.path)) for p in projects}
+    owners: dict[str, set[str]] = {}
+    for k, (own, _) in info.items():
+        for n in own:
+            owners.setdefault(n, set()).add(k)
+    edges: dict[str, set[str]] = {p.key: set() for p in projects}
+    for k, (_, deps) in info.items():
+        for n in deps:
+            o = owners.get(n)
+            if o and len(o) == 1:
+                (t,) = o
+                if t != k:
+                    edges[k].add(t)
+    return edges
+
+
+def full_graph(projects: list[Project], names: bool = False):
     """(edges, inferred_only, comps): declared + inferred edges merged. `inferred_only` is the
-    set of (src, dst) pairs not backed by a declared `depends:`. Cycles are over the union."""
+    set of (src, dst) pairs not backed by a declared `depends:`. Cycles are over the union.
+    `names=True` also infers edges from package-name matches (heuristic, opt-in)."""
     declared = build_edges(projects)
     inferred = infer_edges(projects)
+    if names:
+        for k, v in infer_edges_by_name(projects).items():
+            inferred.setdefault(k, set()).update(v)
     merged = {k: declared[k] | inferred.get(k, set()) for k in declared}
     only = {(a, b) for a, bs in merged.items() for b in bs if b not in declared[a]}
     return merged, only, sccs(merged)

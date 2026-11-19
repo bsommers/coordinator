@@ -78,3 +78,19 @@ def test_infer_edges_from_manifests(tmp_path):
     assert e["lib"] == set()
     merged, only, comps = graph.full_graph(ps)
     assert ("app", "lib") in only and merged["app"] == {"lib"}
+
+
+def test_infer_edges_by_name_skips_ambiguous_and_self(tmp_path):
+    for n in ("a", "b", "c", "d"):
+        (tmp_path / n).mkdir()
+    (tmp_path / "a" / "pyproject.toml").write_text(
+        '[project]\nname = "alpha"\ndependencies = ["Beta_Pkg>=1", "dup", "alpha"]\n')
+    (tmp_path / "b" / "pyproject.toml").write_text('[project]\nname = "beta-pkg"\n')
+    (tmp_path / "c" / "package.json").write_text('{"name": "dup", "dependencies": {"alpha": "1"}}')
+    (tmp_path / "d" / "Cargo.toml").write_text('[package]\nname = "dup"\n[dependencies]\nbeta-pkg = "1"\n')
+    ps = [Project(key=n, path=str(tmp_path / n), name=n) for n in "abcd"]
+    e = graph.infer_edges_by_name(ps)
+    assert e["a"] == {"b"}          # dup is ambiguous (c and d), self-ref skipped
+    assert e["c"] == {"a"} and e["d"] == {"b"}
+    assert graph.full_graph(ps)[1] == set()  # off by default
+    assert ("a", "b") in graph.full_graph(ps, names=True)[1]
